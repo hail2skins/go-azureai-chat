@@ -31,7 +31,7 @@ func main() {
 	// Define a route for the "/api/chat" path that handles chat completions
 	r.POST("/api/chat", func(c *gin.Context) {
 		prompt := c.PostForm("prompt")
-		response, err := openaiclient.ChatCompletion(client, prompt, openai.GPT3Dot5Turbo0301)
+		response, err := openaiclient.ChatCompletion(client, prompt, openai.GPT4)
 
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
