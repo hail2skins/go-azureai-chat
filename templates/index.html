@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with GPT</title>
+    <style>
+        .conversation {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat with GPT</h1>
+    <form id="chat-form">
+        <label for="prompt">Your message:</label>
+        <textarea id="prompt" name="prompt" rows="4" cols="50"></textarea>
+        <button type="submit">Send</button>
+    </form>
+    <div id="conversation-container"></div>
+
+    <script>
+        document.getElementById("chat-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const prompt = document.getElementById("prompt").value;
+            const conversationContainer = document.getElementById("conversation-container");
+
+            if (prompt.trim() === "") {
+                return;
+            }
+
+            const userMessage = document.createElement("div");
+            userMessage.className = "conversation";
+            userMessage.textContent = `My Question: ${prompt}`;
+            conversationContainer.appendChild(userMessage);
+
+            try {
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `prompt=${encodeURIComponent(prompt)}`,
+                });
+
+                const aiMessage = document.createElement("div");
+                aiMessage.className = "conversation";
+
+                if (response.ok) {
+                    const data = await response.json();
+                    aiMessage.textContent = `${data.response}`;
+                } else {
+                    const error = await response.text();
+                    aiMessage.textContent = `Error: ${error}`;
+                }
+
+                conversationContainer.appendChild(aiMessage);
+            } catch (err) {
+                const aiMessage = document.createElement("div");
+                aiMessage.className = "conversation";
+                aiMessage.textContent = `Error: ${err.message}`;
+                conversationContainer.appendChild(aiMessage);
+            }
+
+            document.getElementById("prompt").value = "";
+        });
+    </script>
+</body>
+</html>
